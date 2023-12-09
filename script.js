@@ -44,12 +44,12 @@ loopify("slingarom_theme.mp3",function(err,loop) {
 
     // Stop it later if you feel like it
     muteBtn.addEventListener("click", ()=>{
-        if(muteBtn.classList[1] == "fa-volume-xmark"){
-            muteBtn.classList.replace("fa-volume-xmark", "fa-volume-high");
+        if(muteBtn.innerHTML == "<strong>Music: OFF</strong>"){
+            muteBtn.innerHTML = "<strong>Music: ON</strong>";
             loop.play();
         }
         else{
-            muteBtn.classList.replace("fa-volume-high", "fa-volume-xmark");
+            muteBtn.innerHTML = "<strong>Music: OFF</strong>";
             loop.stop();
         }
     });

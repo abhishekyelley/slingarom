@@ -17,11 +17,15 @@ body{
 
 #muteBtn{
     color:white;
+    background: none;
+    border: none;
     position: absolute;
     top: 30px;
     left:20px;
-    font-size: 40px;
+    
     cursor: pointer;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 40px;
 }
 
 .canvas-div{
