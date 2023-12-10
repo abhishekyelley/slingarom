@@ -4,17 +4,78 @@ const scoreField = document.querySelector("#score");
 const movesField = document.querySelector("#moves");
 const mainHeading = document.querySelector("#mainHeading");
 const muteBtn = document.querySelector("#muteBtn");
+const menuBtn = document.querySelector("#menuBtn");
+const menuItems = document.querySelector("#menuItems");
+const applyBtn = document.querySelector("#applyBtn");
 const canvasWidth = myCanvas.width;
 const canvasHeight = myCanvas.height;
-const boundRadius = 120;    // determines how far you can pull the sling
+
+// Inital co-ords for boundCircle
 var boundX = canvasWidth/2;
 var boundY = canvasHeight/2;
+const foodRadius = 15;
+const foodSpawnPadding = 50;
+
+// configurables
 const ballRadius = 50;
 const gravity = 0.5;
 const friction = 0.65;
 const speedFactor = 0.5;    // determines launch speed
-const foodRadius = 15;
-const foodSpawnPadding = 50;
+const totalFood = 3;
+const boundRadius = 120;    // determines how far you can pull the sling
+
+
+
+const gameConfig = {
+    _ballRadius : 50,
+    _gravity : 0.5,
+    _friction : 0.65,
+    _speedFactor : 0.5,
+    _boundRadius : 120,
+    get ballRadius(){
+        return this._ballRadius;
+    },
+    get gravity(){
+        return this._gravity;
+    },
+    get friction(){
+        return this._friction;
+    },
+    get speedFactor(){
+        return this._speedFactor;
+    },
+    get boundRadius(){
+        return this._boundRadius;
+    },
+
+    set ballRadius(value){
+        value = parseInt(value, 10);
+        if(typeof value === 'number' && !isNaN(value)){
+            value = Math.max(10, Math.min(150, value));
+        }
+        else{
+            value = ballRadius;
+        }
+        this._ballRadius = value;
+    },
+    set gravity(value){
+        this._gravity = value;
+    },
+    set friction(value){
+        this._friction = value;
+    },
+    set speedFactor(value){
+        this._speedFactor = value;
+    },
+    set boundRadius(value){
+        this._boundRadius = value;
+    }
+};
+
+console.log(gameConfig.ballRadius);
+gameConfig.ballRadius = " 94   ";
+console.log(gameConfig.ballRadius);
+
 var running = false;
 const ctx = myCanvas.getContext("2d");
 ctx.imageSmoothingEnabled = false;
@@ -40,22 +101,43 @@ loopify("slingarom_theme.mp3",function(err,loop) {
     }
 
     // Play it whenever you want
-    loop.play();
+    // loop.play();
 
     // Stop it later if you feel like it
     muteBtn.addEventListener("click", ()=>{
-        if(muteBtn.innerHTML == "<strong>Music: OFF</strong>"){
-            muteBtn.innerHTML = "<strong>Music: ON</strong>";
-            loop.play();
-        }
-        else{
-            muteBtn.innerHTML = "<strong>Music: OFF</strong>";
+        if(muteBtn.innerHTML == `<i class="fa-solid fa-volume-high" aria-hidden="true"></i>`){
+            muteBtn.innerHTML = `<i class="fa-solid fa-volume-xmark" aria-hidden="true"></i>`;
             loop.stop();
         }
+        else{
+            muteBtn.innerHTML = `<i class="fa-solid fa-volume-high" aria-hidden="true"></i>`;
+            loop.play();
+        }
     });
-
-
 });
+
+menuBtn.addEventListener("click", ()=>{
+    if(menuItems.style.opacity == "0"){
+        // menuItems.style.display = "block";
+        menuItems.style.left = "0vh";
+        menuItems.style.opacity = "1";
+    }
+    else{
+        // menuItems.style.display = "none";
+        menuItems.style.left = "-"+menuItems.style.width;
+        menuItems.style.opacity = "0";
+    }
+});
+// addEventListener("mouseup", ()=>{
+//     if(menuItems.style.opacity == "1")
+//         menuBtn.click();
+// });
+applyBtn.addEventListener("click", ()=>{
+    foodPositions = [];
+    initFood(gameConfig.totalFood);
+    resetBtn.click();
+});
+
 function playHitAudio() {
 
     // console.log(hitSound.currentTime);
@@ -72,12 +154,12 @@ function playFoodAudio() {
     foodBiteSound.play();
 }
 
-const ballHolderRadius = (ballRadius * Math.sqrt(2)).toFixed(0);
+
 
 var foodPositions = [];
-const totalFood = 3;
-function initFood(totalFood){
-    for(var i=0; i<totalFood; i++)
+
+function initFood(value){
+    for(var i=0; i<value; i++)
         foodPositions.push({});
 }
 initFood(totalFood);
@@ -221,7 +303,7 @@ var ball = new Ball(canvasWidth/2, canvasHeight/2, ballRadius, 0, 0);
 createFood();
 drawAllFood();
 ball.drawBall();
-
+const ballHolderRadius = (ball.radius * Math.sqrt(2)).toFixed(0);
 
 
 function handleMouseDown(){
@@ -236,38 +318,22 @@ function handleMouseDown(){
     // console.log(ball.posX, ball.posY, ball.xVel, ball.yVel);
 
     // Listen for mouse position after grabbing ball
-    myCanvas.addEventListener("mousemove", handleMoveOnDown);
+    addEventListener("mousemove", handleMoveOnDown);
 
     // When ball is dragged and released
 
     // ------------!!!!! ANIMATE IS CALLED HERE !!!!!------------
     // ------------!!!!! ANIMATE IS CALLED HERE !!!!!------------
     // ------------!!!!! ANIMATE IS CALLED HERE !!!!!------------
-    myCanvas.addEventListener("mouseup", ()=>{
-        myCanvas.removeEventListener("mousemove", handleMoveOnDown);
-        if(!running){
-            MOVES++;
-            setMoves();
-            running = true;
-            let deltaX = ball.posX - boundX;
-            let deltaY = ball.posY - boundY;
-            let pulledDistance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
-
-            // Adjust the velocity based on the distance and add some initial velocity for a more realistic bounce
-            let initialSpeed = speedFactor*pulledDistance;
-            let angle = Math.atan2(deltaY, deltaX);
-            ball.xVel = -initialSpeed * Math.cos(angle);
-            ball.yVel = -initialSpeed * Math.sin(angle);
-            animate();
-        }
-    });
+    addEventListener("mouseup", handleMouseUp);
 }
 
 // Calculates and draws ball position when being dragged
 function handleMoveOnDown(moveEvent){
-    let curX = moveEvent.offsetX;
-    let curY = moveEvent.offsetY;
-    
+    // console.log(moveEvent);
+    let curX = moveEvent.pageX - myCanvas.offsetLeft;
+    let curY = moveEvent.pageY - myCanvas.offsetTop;
+    // console.log(curX, curY, moveEvent.clientX, moveEvent.clientY);
     // Adjust ball position to bounds
     // checks if mouse is outside bounds
         if(Math.pow(curX-boundX, 2) + Math.pow(curY-boundY, 2) > boundRadius*boundRadius){
@@ -296,31 +362,56 @@ function handleMoveOnDown(moveEvent){
     
 
 }
+// ------------!!!!! ANIMATE IS CALLED HERE !!!!!------------
+function handleMouseUp(){
+    removeEventListener("mousemove", handleMoveOnDown);
+    if(!running){
+        MOVES++;
+        setMoves();
+        running = true;
+        let deltaX = ball.posX - boundX;
+        let deltaY = ball.posY - boundY;
+        let pulledDistance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
 
+        // Adjust the velocity based on the distance and add some initial velocity for a more realistic bounce
+        let initialSpeed = speedFactor*pulledDistance;
+        let angle = Math.atan2(deltaY, deltaX);
+        ball.xVel = -initialSpeed * Math.cos(angle);
+        ball.yVel = -initialSpeed * Math.sin(angle);
+        animate();
+    }
+    removeEventListener("mouseup", handleMouseUp);
+}
+
+const straightLineFreedom = 20;
 function drawBallHolder(){
-    ctx.beginPath();
-    ctx.moveTo(ball.posX-ball.radius, ball.posY);
-    ctx.lineTo(ball.posX+ball.radius, ball.posY);
-    ctx.stroke();
-    ctx.closePath();
-
-    /*
-    if(true || ball.posY >= boundY){
+    if(ball.posY <= boundY+straightLineFreedom && ball.posY >= boundY-straightLineFreedom){
         ctx.beginPath();
-        ctx.arc(ball.posX, ball.posY+ball.radius, ballHolderRadius, 0.785398 + Math.PI, 2.35619 + Math.PI);
-        ctx.arc(ball.posX, ball.posY-ball.radius, ballHolderRadius, 0.785398, 2.35619);
-        ctx.fillStyle = '#000000';
-        ctx.fill();
+        ctx.moveTo(ball.posX-ball.radius, ball.posY);
+        ctx.lineTo(ball.posX+ball.radius, ball.posY);
+        ctx.stroke();
         ctx.closePath();
     }
-    */
+    else if(ball.posY >= boundY){
+        ctx.beginPath();
+        ctx.arc(ball.posX, ball.posY-ball.radius, ballHolderRadius, 0.785398, 2.35619);
+        ctx.stroke();
+        ctx.closePath();
+    }
+    else{
+        ctx.beginPath();
+        ctx.arc(ball.posX, ball.posY+ball.radius, ballHolderRadius, 0.785398 + Math.PI, 2.35619 + Math.PI);
+        ctx.stroke();
+        ctx.closePath();
+    }
 
 }
 
 
 // Listen for mouse position to find if its on ball
 myCanvas.addEventListener("mousemove", (moveEvent)=>{
-    if(Math.pow(moveEvent.offsetX-ball.posX, 2) + Math.pow(moveEvent.offsetY-ball.posY, 2) <= ballRadius*ballRadius){
+    // theres an issue here when the ball is on ground and when mouse hovers and then moves away from the ball in downwards, the cursor is still in grab
+    if(Math.pow(moveEvent.offsetX-ball.posX, 2) + Math.pow(moveEvent.offsetY-ball.posY, 2) <= ball.radius*ball.radius){
         document.body.style.cursor = "grab";
         myCanvas.addEventListener("mousedown", handleMouseDown);
     }
@@ -344,12 +435,13 @@ function animate(){
     }
 };
 
-resetBtn.addEventListener("click", ()=>{
+
+function resetGame(){
     running = false;
     mainHeading.textContent = "PULL THE BALL";
     boundX = canvasWidth/2;
     boundY = canvasHeight/2;
-    ball = new Ball(boundX, boundY, ballRadius, 0, 0);
+    ball = new Ball(boundX, boundY, ball.radius, 0, 0);
     SCORE = 0;
     MOVES = 0;
     setScore();
@@ -358,4 +450,9 @@ resetBtn.addEventListener("click", ()=>{
     createFood();
     drawAllFood();
     ball.drawBall();
+}
+
+
+resetBtn.addEventListener("click", ()=>{
+    resetGame();
 });
