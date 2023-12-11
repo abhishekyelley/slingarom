@@ -7,6 +7,15 @@ const muteBtn = document.querySelector("#muteBtn");
 const menuBtn = document.querySelector("#menuBtn");
 const menuItems = document.querySelector("#menuItems");
 const applyBtn = document.querySelector("#applyBtn");
+const restoreBtn = document.querySelector("#restoreBtn");
+
+const ballRadiusInput = document.querySelector("#ballRadiusInput");
+const gravityInput = document.querySelector("#gravityInput");
+const frictionInput = document.querySelector("#frictionInput");
+const speedFactorInput = document.querySelector("#speedFactorInput");
+const totalFoodInput = document.querySelector("#totalFoodInput");
+const boundRadiusInput = document.querySelector("#boundRadiusInput");
+
 const canvasWidth = myCanvas.width;
 const canvasHeight = myCanvas.height;
 
@@ -17,21 +26,20 @@ const foodRadius = 15;
 const foodSpawnPadding = 50;
 
 // configurables
-const ballRadius = 50;
-const gravity = 0.5;
-const friction = 0.65;
-const speedFactor = 0.5;    // determines launch speed
-const totalFood = 3;
-const boundRadius = 120;    // determines how far you can pull the sling
-
-
+const defaultBallRadius = 50;
+const defaultGravity = 0.5;
+const defaultFriction = 0.65;
+const defaultSpeedFactor = 0.5;    // determines launch speed
+const defaultTotalFood = 4;
+const defaultBoundRadius = 120;    // determines how far you can pull the sling
 
 const gameConfig = {
-    _ballRadius : 50,
-    _gravity : 0.5,
-    _friction : 0.65,
-    _speedFactor : 0.5,
-    _boundRadius : 120,
+    _ballRadius : defaultBallRadius,
+    _gravity : defaultGravity,
+    _friction : defaultFriction,
+    _speedFactor : defaultSpeedFactor,
+    _totalFood : defaultTotalFood,
+    _boundRadius : defaultBoundRadius,
     get ballRadius(){
         return this._ballRadius;
     },
@@ -44,6 +52,9 @@ const gameConfig = {
     get speedFactor(){
         return this._speedFactor;
     },
+    get totalFood(){
+        return this._totalFood;
+    },
     get boundRadius(){
         return this._boundRadius;
     },
@@ -51,30 +62,82 @@ const gameConfig = {
     set ballRadius(value){
         value = parseInt(value, 10);
         if(typeof value === 'number' && !isNaN(value)){
-            value = Math.max(10, Math.min(150, value));
+            value = Math.max(10, Math.min(100, value));
         }
         else{
-            value = ballRadius;
+            value = defaultBallRadius;
         }
         this._ballRadius = value;
     },
     set gravity(value){
+        value = parseFloat(value);
+        if(typeof value === 'number' && !isNaN(value)){
+            value = Math.max(0, Math.min(10, value));
+        }
+        else{
+            value = defaultGravity;
+        }
         this._gravity = value;
     },
     set friction(value){
+        value = parseFloat(value);
+        if(typeof value === 'number' && !isNaN(value)){
+            value = Math.max(0, Math.min(1, value));
+        }
+        else{
+            value = defaultFriction;
+        }
         this._friction = value;
     },
     set speedFactor(value){
+        value = parseFloat(value);
+        if(typeof value === 'number' && !isNaN(value)){
+            value = Math.max(0.1, Math.min(10, value));
+        }
+        else{
+            value = defaultSpeedFactor;
+        }
         this._speedFactor = value;
     },
+    set totalFood(value){
+        value = parseInt(value, 10);
+        if(typeof value === 'number' && !isNaN(value)){
+            value = Math.max(1, Math.min(10, value));
+        }
+        else{
+            value = defaultTotalFood;
+        }
+        this._totalFood = value;
+    },
     set boundRadius(value){
+        value = parseInt(value, 10);
+        if(typeof value === 'number' && !isNaN(value)){
+            value = Math.max(120, Math.min(200, value));
+        }
+        else{
+            value = defaultBoundRadius;
+        }
         this._boundRadius = value;
     }
 };
 
-console.log(gameConfig.ballRadius);
-gameConfig.ballRadius = " 94   ";
-console.log(gameConfig.ballRadius);
+function setValuesInputFields(){
+    gameConfig.ballRadius = ballRadiusInput.value;
+    gameConfig.gravity = gravityInput.value;
+    gameConfig.friction = frictionInput.value;
+    gameConfig.speedFactor = speedFactorInput.value;
+    gameConfig.totalFood = totalFoodInput.value;
+    gameConfig.boundRadius = boundRadiusInput.value;
+
+    ballRadiusInput.value = gameConfig.ballRadius;
+    gravityInput.value = gameConfig.gravity;
+    frictionInput.value = gameConfig.friction;
+    speedFactorInput.value = gameConfig.speedFactor;
+    totalFoodInput.value = gameConfig.totalFood;
+    boundRadiusInput.value = gameConfig.boundRadius;
+}
+
+setValuesInputFields();
 
 var running = false;
 const ctx = myCanvas.getContext("2d");
@@ -124,20 +187,26 @@ menuBtn.addEventListener("click", ()=>{
     }
     else{
         // menuItems.style.display = "none";
-        menuItems.style.left = "-"+menuItems.style.width;
+        menuItems.style.left = "-" + menuItems.style.width;
         menuItems.style.opacity = "0";
     }
 });
-// addEventListener("mouseup", ()=>{
-//     if(menuItems.style.opacity == "1")
-//         menuBtn.click();
-// });
 applyBtn.addEventListener("click", ()=>{
+    setValuesInputFields();
     foodPositions = [];
     initFood(gameConfig.totalFood);
+    
     resetBtn.click();
 });
-
+restoreBtn.addEventListener("click", ()=>{
+    ballRadiusInput.value = "";
+    gravityInput.value = "";
+    frictionInput.value = "";
+    speedFactorInput.value = "";
+    totalFoodInput.value = "";
+    boundRadiusInput.value = "";
+    applyBtn.click();
+});
 function playHitAudio() {
 
     // console.log(hitSound.currentTime);
@@ -162,9 +231,9 @@ function initFood(value){
     for(var i=0; i<value; i++)
         foodPositions.push({});
 }
-initFood(totalFood);
+initFood(gameConfig.totalFood);
 function createFood(){
-    for(var i=0; i<3; i++){
+    for(var i=0; i<gameConfig.totalFood; i++){
         foodPositions[i] = {
             x : Math.floor(Math.random()*(canvasWidth-2*foodSpawnPadding)) + foodSpawnPadding,
             y : Math.floor(Math.random()*(canvasHeight-2*foodSpawnPadding)) + foodSpawnPadding,
@@ -210,13 +279,13 @@ function drawAllFood(){
 
 function drawBelts(){
     ctx.beginPath();
-    ctx.moveTo(boundX-boundRadius, boundY);
+    ctx.moveTo(boundX-gameConfig.boundRadius, boundY);
     ctx.lineTo(ball.posX-ball.radius, ball.posY);
     ctx.stroke();
     ctx.closePath();
 
     ctx.beginPath();
-    ctx.moveTo(boundX+boundRadius, boundY);
+    ctx.moveTo(boundX+gameConfig.boundRadius, boundY);
     ctx.lineTo(ball.posX+ball.radius, ball.posY);
     ctx.stroke();
     ctx.closePath();
@@ -225,7 +294,7 @@ function drawBelts(){
 
 function drawBoundingCircle(){
     ctx.beginPath();
-    ctx.arc(boundX, boundY, boundRadius, 0, 2 * Math.PI);
+    ctx.arc(boundX, boundY, gameConfig.boundRadius, 0, 2 * Math.PI);
     ctx.stroke();
     ctx.closePath();
 }
@@ -259,19 +328,19 @@ class Ball {
         let lastPosY = this.posY;
         if(this.posY + this.radius + this.yVel >= canvasHeight){
             playHitAudio();
-            this.yVel *= -friction;
-            this.xVel *= friction;
+            this.yVel *= -gameConfig.friction;
+            this.xVel *= gameConfig.friction;
         }
         else{
-            this.yVel += gravity;
+            this.yVel += gameConfig.gravity;
         }
         if(this.posY - this.radius + this.yVel <= 0){
             playHitAudio();
-            this.yVel *= -friction;
+            this.yVel *= -gameConfig.friction;
         }
         if (this.posX + this.radius + this.xVel>= canvasWidth || this.posX - this.radius + this.xVel <= 0){
             playHitAudio();
-		    this.xVel *= -friction;
+		    this.xVel *= -gameConfig.friction;
 		}
         this.posX += this.xVel;
         this.posY += this.yVel;
@@ -299,11 +368,11 @@ class Ball {
 }
 
 // ---------------INTIALIZE BALL----------------
-var ball = new Ball(canvasWidth/2, canvasHeight/2, ballRadius, 0, 0);
+var ball = new Ball(canvasWidth/2, canvasHeight/2, gameConfig.ballRadius, 0, 0);
 createFood();
 drawAllFood();
 ball.drawBall();
-const ballHolderRadius = (ball.radius * Math.sqrt(2)).toFixed(0);
+var ballHolderRadius = (ball.radius * Math.sqrt(2)).toFixed(0);
 
 
 function handleMouseDown(){
@@ -336,15 +405,15 @@ function handleMoveOnDown(moveEvent){
     // console.log(curX, curY, moveEvent.clientX, moveEvent.clientY);
     // Adjust ball position to bounds
     // checks if mouse is outside bounds
-        if(Math.pow(curX-boundX, 2) + Math.pow(curY-boundY, 2) > boundRadius*boundRadius){
+        if(Math.pow(curX-boundX, 2) + Math.pow(curY-boundY, 2) > gameConfig.boundRadius*gameConfig.boundRadius){
             let slope = (curY - boundY) / (curX - boundX);
             if(curX >= boundX){
-                curX = boundX + boundRadius*Math.cos(Math.atan(slope));
-                curY = boundY + boundRadius*Math.sin(Math.atan(slope));
+                curX = boundX + gameConfig.boundRadius*Math.cos(Math.atan(slope));
+                curY = boundY + gameConfig.boundRadius*Math.sin(Math.atan(slope));
             }
             else{
-                curX = boundX - boundRadius*Math.cos(Math.atan(slope));
-                curY = boundY - boundRadius*Math.sin(Math.atan(slope));
+                curX = boundX - gameConfig.boundRadius*Math.cos(Math.atan(slope));
+                curY = boundY - gameConfig.boundRadius*Math.sin(Math.atan(slope));
             }
         }
     
@@ -374,7 +443,7 @@ function handleMouseUp(){
         let pulledDistance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
 
         // Adjust the velocity based on the distance and add some initial velocity for a more realistic bounce
-        let initialSpeed = speedFactor*pulledDistance;
+        let initialSpeed = gameConfig.speedFactor*pulledDistance;
         let angle = Math.atan2(deltaY, deltaX);
         ball.xVel = -initialSpeed * Math.cos(angle);
         ball.yVel = -initialSpeed * Math.sin(angle);
@@ -441,7 +510,8 @@ function resetGame(){
     mainHeading.textContent = "PULL THE BALL";
     boundX = canvasWidth/2;
     boundY = canvasHeight/2;
-    ball = new Ball(boundX, boundY, ball.radius, 0, 0);
+    ball = new Ball(boundX, boundY, gameConfig.ballRadius, 0, 0);
+    ballHolderRadius = (ball.radius * Math.sqrt(2)).toFixed(0);
     SCORE = 0;
     MOVES = 0;
     setScore();
