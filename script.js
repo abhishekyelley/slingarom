@@ -154,9 +154,9 @@ function setMoves(){
     movesField.innerHTML = `<strong>MOVES: ${MOVES}</strong>`;
 }
 
-const hitSound = new Audio("hit.mp3");
-const foodBiteSound = new Audio("eat.mp3");
-loopify("slingarom_theme.mp3",function(err,loop) {
+const hitSound = new Audio("assets/audio/hit.mp3");
+const foodBiteSound = new Audio("assets/audio/eat.mp3");
+loopify("assets/audio/slingarom_theme.mp3",function(err,loop) {
 
     // If something went wrong, `err` is supplied
     if (err) {
