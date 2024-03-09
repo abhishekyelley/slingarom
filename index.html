@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,47 +8,62 @@
     <link rel="shortcut icon" href="#">
     <script src="https://kit.fontawesome.com/bfdf36bf19.js" crossorigin="anonymous"></script>
     <title>Slingaroms</title>
-    
-</head> 
+
+</head>
+
 <body>
-    <button id="muteBtn" title="Background Music"><i class="fa-solid fa-volume-xmark" aria-hidden="true"></i></button>
-    <button id="menuBtn" title="Game Settings"><i class="fa-solid fa-bars"></i></button>
-
-    <div id="menuItems" class="menu-items" style="left: -50vh; opacity: 0; width: 40vh;">
-        <div class="game-config">
-            <label for="ballRadiusInput">Ball Size</label>
-            <input id="ballRadiusInput" type="text" value="50">
-
-            <label for="gravityInput">Gravity</label>
-            <input id="gravityInput" type="text" value="0.5">
-
-            <label for="frictionInput">Friction</label>
-            <input id="frictionInput" type="text" value="0.65">
-
-            <label for="speedFactorInput">Launch Speed</label>
-            <input id="speedFactorInput" type="text" value="0.5">
-
-            <label for="totalFoodInput">Total Food</label>
-            <input id="totalFoodInput" type="text" value="3">
-
-            <label for="boundRadiusInput">Sling Radius</label>
-            <input id="boundRadiusInput" type="text" value="120">
-            
-            <button class="nrmlBtn" id="applyBtn">Apply</button>
-            <button class="nrmlBtn" id="restoreBtn" style="background-color: gray;">Restore Defaults</button>
-        </div>
+    <div class="heading-container">
+        <button id="menuBtn" title="Game Settings">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <h2 title="Pull it. Don't reset when the ball falls. Keep pulling! Try pulling it mid air too."
+            id="mainHeading">PULL THE BALL</h2>
+        <button id="muteBtn" title="Background Music">
+            <i class="fa-solid fa-volume-xmark" aria-hidden="true"></i>
+        </button>
     </div>
-    <div class="canvas-div">
-        <h2 title="Pull it. Don't reset when the ball falls. Keep pulling! Try pulling it mid air too." id="mainHeading">PULL THE BALL</h2>
-        <canvas id="myCanvas" height="800px" width="800px" style="border: 1px solid black; border-radius: 20px" >
-        </canvas>
-        <div class="bottom-text">
-            <p id="score"><strong>SCORE: 0</strong></p>
-            <button class="nrmlBtn" id="resetBtn">Reset</button>
-            <p id="moves"><strong>MOVES: 0</strong></p>
+
+    <div class="game-container">
+
+        <div id="menuItems" class="menu-items" style="left: -50vh; opacity: 0; width: 40vh;">
+            <div class="game-config">
+                <form id="gameConfigForm" class="game-config">
+                    <label for="ballRadiusInput">Ball Size</label>
+                    <input id="ballRadiusInput" type="text" value="50">
+
+                    <label for="gravityInput">Gravity</label>
+                    <input id="gravityInput" type="text" value="0.5">
+
+                    <label for="frictionInput">Friction</label>
+                    <input id="frictionInput" type="text" value="0.65">
+
+                    <label for="speedFactorInput">Launch Speed</label>
+                    <input id="speedFactorInput" type="text" value="0.5">
+
+                    <label for="totalFoodInput">Total Food</label>
+                    <input id="totalFoodInput" type="text" value="4">
+
+                    <label for="boundRadiusInput">Sling Radius</label>
+                    <input id="boundRadiusInput" type="text" value="120">
+
+                    <button class="nrmlBtn" id="applyBtn" type="submit">Apply</button>
+                </form>
+                <button class="nrmlBtn" id="restoreBtn" style="background-color: gray;">Restore Defaults</button>
+            </div>
+        </div>
+        <div class="canvas-div">
+
+            <canvas id="myCanvas" height="800px" width="800px" style="border: 1px solid black; border-radius: 20px">
+            </canvas>
+            <div class="bottom-text">
+                <p id="score"><strong>SCORE: 0</strong></p>
+                <button class="nrmlBtn resetBtnCls" id="resetBtn">Reset</button>
+                <p id="moves"><strong>MOVES: 0</strong></p>
+            </div>
         </div>
     </div>
     <script src="loopify.js" type="text/javascript"></script>
     <script src="script.js"></script>
 </body>
+
 </html>
