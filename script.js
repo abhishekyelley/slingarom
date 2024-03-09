@@ -458,7 +458,7 @@ function generateRandomScale() {
 }
 
 function drawBackgroundImage() {
-    if(!gameConfig.backgroundImage)
+    if (!gameConfig.backgroundImage)
         return;
     ctx.filter = 'blur(8px)';
     // scale = generateRandomScale();
@@ -514,8 +514,10 @@ function handleMoveOnDown(moveEvent) {
     }
     clearCanvas();
     ctx.strokeStyle = "#FFFFFF";
+    // ctx.strokeStyle = "#4c3228";
     drawBelts();
     drawAllFood();
+    ctx.strokeStyle = "#FFFFFF";
     drawArrow();
     ball.drawBall();
 
@@ -591,6 +593,7 @@ function handleMouseUp() {
 
 const straightLineFreedom = 20;
 function drawBallHolder() {
+    /*
     if (ball.posY <= boundY + straightLineFreedom && ball.posY >= boundY - straightLineFreedom) {
         ctx.beginPath();
         ctx.moveTo(ball.posX - ball.radius, ball.posY);
@@ -610,7 +613,21 @@ function drawBallHolder() {
         ctx.stroke();
         ctx.closePath();
     }
+    */
+    ctx.fillStyle = "#4c3228";
+    ctx.beginPath();
+    ctx.roundRect(ball.posX-(ball.radius*0.8), ball.posY-(ball.radius*0.4), ball.radius*1.6, ball.radius*0.8, [8]);
+    ctx.fill();
+    ctx.closePath();
+    ctx.fillStyle = ball.color;
 
+    ctx.strokeStyle = "#4c3228";
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(ball.posX-ball.radius, ball.posY);
+    ctx.lineTo(ball.posX+ball.radius, ball.posY);
+    ctx.stroke();
+    ctx.closePath();
 }
 
 
