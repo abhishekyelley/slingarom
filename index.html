@@ -46,9 +46,35 @@
                     <label for="boundRadiusInput">Sling Radius</label>
                     <input id="boundRadiusInput" type="text" value="120">
 
-                    <button class="nrmlBtn" id="applyBtn" type="submit">Apply</button>
+                    <div
+                        style="background: rgb(238,174,202);
+                        background: radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%);
+                        border-radius: 5px; display: flex; flex-direction: row; flex-wrap: nowrap;
+                        justify-content: space-between; margin-top: 20px; padding-left: 10px; padding-right: 10px;">
+
+                        <label for="isBackgroundImage" style="color: black">Background Image</label>
+                        <input style="width: 50px; border-radius: 5px;" id="isBackgroundImage" type="checkbox" checked>
+
+                    </div>
+
+                    <div style="display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: center;">
+                        <button class="nrmlBtn" id="applyBtn" type="submit">Apply</button>
+                    </div>
                 </form>
-                <button class="nrmlBtn" id="restoreBtn" style="background-color: gray;">Restore Defaults</button>
+                <div style="display: flex; flex-direction: row; flex-wrap: nowrap;">
+                    <button class="nrmlBtn randomizeBtn" id="randomizeBtn">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        Randomize
+                    </button>
+                    <button class="nrmlBtn" id="restoreBtn"
+                        style="background-color: gray; color: white; font-weight: bold;">
+                        <i class="fa fa-refresh" aria-hidden="true"></i>
+                        Restore Defaults
+                    </button>
+                </div>
+                <div style="display: flex; flex-direction: row; flex-wrap: nowrap;">
+
+                </div>
             </div>
         </div>
         <div class="canvas-div">

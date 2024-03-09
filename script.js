@@ -7,7 +7,9 @@ const muteBtn = document.querySelector("#muteBtn");
 const menuBtn = document.querySelector("#menuBtn");
 const menuItems = document.querySelector("#menuItems");
 const gameConfigForm = document.querySelector("#gameConfigForm");
+const applyBtn = document.querySelector("#applyBtn");
 const restoreBtn = document.querySelector("#restoreBtn");
+const randomizeBtn = document.querySelector("#randomizeBtn");
 
 const ballRadiusInput = document.querySelector("#ballRadiusInput");
 const gravityInput = document.querySelector("#gravityInput");
@@ -15,6 +17,7 @@ const frictionInput = document.querySelector("#frictionInput");
 const speedFactorInput = document.querySelector("#speedFactorInput");
 const totalFoodInput = document.querySelector("#totalFoodInput");
 const boundRadiusInput = document.querySelector("#boundRadiusInput");
+const isBackgroundImage = document.querySelector("#isBackgroundImage");
 
 const canvasWidth = myCanvas.width;
 const canvasHeight = myCanvas.height;
@@ -40,6 +43,7 @@ const gameConfig = {
     _speedFactor: defaultSpeedFactor,
     _totalFood: defaultTotalFood,
     _boundRadius: defaultBoundRadius,
+    _backgroundImage: false,
     get ballRadius() {
         return this._ballRadius;
     },
@@ -58,6 +62,9 @@ const gameConfig = {
     get boundRadius() {
         return this._boundRadius;
     },
+    get backgroundImage() {
+        return this._backgroundImage;
+    },
 
     set ballRadius(value) {
         value = parseInt(value, 10);
@@ -71,6 +78,8 @@ const gameConfig = {
     },
     set gravity(value) {
         value = parseFloat(value);
+        value = value.toFixed(2);
+        value = parseFloat(value);
         if (typeof value === 'number' && !isNaN(value)) {
             value = Math.max(0, Math.min(10, value));
         }
@@ -80,6 +89,8 @@ const gameConfig = {
         this._gravity = value;
     },
     set friction(value) {
+        value = parseFloat(value);
+        value = value.toFixed(2);
         value = parseFloat(value);
         if (typeof value === 'number' && !isNaN(value)) {
             value = Math.max(0, Math.min(1, value));
@@ -91,8 +102,10 @@ const gameConfig = {
     },
     set speedFactor(value) {
         value = parseFloat(value);
+        value = value.toFixed(2);
+        value = parseFloat(value);
         if (typeof value === 'number' && !isNaN(value)) {
-            value = Math.max(0.1, Math.min(10, value));
+            value = Math.max(0.1, Math.min(2, value));
         }
         else {
             value = defaultSpeedFactor;
@@ -118,7 +131,10 @@ const gameConfig = {
             value = defaultBoundRadius;
         }
         this._boundRadius = value;
-    }
+    },
+    set backgroundImage(value) {
+        this._backgroundImage = value;
+    },
 };
 
 function setValuesInputFields() {
@@ -128,6 +144,7 @@ function setValuesInputFields() {
     gameConfig.speedFactor = speedFactorInput.value;
     gameConfig.totalFood = totalFoodInput.value;
     gameConfig.boundRadius = boundRadiusInput.value;
+    gameConfig.backgroundImage = isBackgroundImage.checked;
 
     ballRadiusInput.value = gameConfig.ballRadius;
     gravityInput.value = gameConfig.gravity;
@@ -135,6 +152,7 @@ function setValuesInputFields() {
     speedFactorInput.value = gameConfig.speedFactor;
     totalFoodInput.value = gameConfig.totalFood;
     boundRadiusInput.value = gameConfig.boundRadius;
+    isBackgroundImage.checked = gameConfig.backgroundImage;
 }
 
 setValuesInputFields();
@@ -179,7 +197,8 @@ loopify("assets/audio/slingarom_theme.mp3", function (err, loop) {
     });
 });
 
-menuBtn.addEventListener("click", () => {
+menuBtn.addEventListener("click", handleMenuClick);
+function handleMenuClick() {
     if (menuItems.style.opacity == "0") {
         // menuItems.style.display = "block";
         menuItems.style.left = "0vh";
@@ -190,7 +209,16 @@ menuBtn.addEventListener("click", () => {
         menuItems.style.left = "-" + menuItems.style.width;
         menuItems.style.opacity = "0";
     }
-});
+}
+
+addEventListener("keyup", handleEscUp);
+function handleEscUp() {
+    // menuItems.style.display = "none";
+    menuItems.style.left = "-" + menuItems.style.width;
+    menuItems.style.opacity = "0";
+}
+
+
 gameConfigForm.addEventListener("submit", (e) => {
     e.preventDefault();
     setValuesInputFields();
@@ -208,6 +236,15 @@ restoreBtn.addEventListener("click", () => {
     boundRadiusInput.value = "";
     applyBtn.click();
 });
+randomizeBtn.addEventListener("click", () => {
+    ballRadiusInput.value = Math.random() * 100;
+    gravityInput.value = Math.random() * 10;
+    frictionInput.value = Math.random();
+    speedFactorInput.value = Math.random() * 2;
+    totalFoodInput.value = Math.random() * 20;
+    boundRadiusInput.value = Math.random() * 200;
+    applyBtn.click();
+})
 function playHitAudio() {
 
     // console.log(hitSound.currentTime);
@@ -401,9 +438,9 @@ class Ball {
 
 async function INIT_CANVAS() {
     backgroundImage.src = "assets/image/alexandru-bogdan-ghita-javr3cmXbSE-unsplash.jpg";
-    await new Promise((res, rej) => {backgroundImage.onload = () => res()})
+    await new Promise((res, rej) => { backgroundImage.onload = () => res() })
     createFood();
-    await drawBackgroundImage();
+    drawBackgroundImage();
     drawAllFood();
     ball.drawBall();
 }
@@ -421,9 +458,11 @@ function generateRandomScale() {
 }
 
 function drawBackgroundImage() {
+    if(!gameConfig.backgroundImage)
+        return;
     ctx.filter = 'blur(8px)';
     // scale = generateRandomScale();
-    ctx.drawImage(backgroundImage, -500, -100, canvasWidth+1000, canvasHeight+1000);
+    ctx.drawImage(backgroundImage, -1400, -50, canvasWidth + 2000, canvasHeight + 2000);
     ctx.filter = 'none';
 }
 
