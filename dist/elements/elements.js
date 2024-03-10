@@ -17,4 +17,24 @@ const speedFactorInput = document.querySelector("#speedFactorInput");
 const totalFoodInput = document.querySelector("#totalFoodInput");
 const boundRadiusInput = document.querySelector("#boundRadiusInput");
 const isBackgroundImage = document.querySelector("#isBackgroundImage");
-export { resetBtn, myCanvas, movesField, scoreField, mainHeading, muteBtn, menuBtn, menuItems, gameConfigForm, applyBtn, restoreBtn, randomizeBtn, ballRadiusInput, gravityInput, frictionInput, speedFactorInput, totalFoodInput, boundRadiusInput, isBackgroundImage, };
+export default {
+    resetBtn,
+    myCanvas,
+    movesField,
+    scoreField,
+    mainHeading,
+    muteBtn,
+    menuBtn,
+    menuItems,
+    gameConfigForm,
+    applyBtn,
+    restoreBtn,
+    randomizeBtn,
+    ballRadiusInput,
+    gravityInput,
+    frictionInput,
+    speedFactorInput,
+    totalFoodInput,
+    boundRadiusInput,
+    isBackgroundImage,
+};

@@ -19,7 +19,7 @@ const totalFoodInput: HTMLInputElement | null = document.querySelector("#totalFo
 const boundRadiusInput: HTMLInputElement | null = document.querySelector("#boundRadiusInput");
 const isBackgroundImage: HTMLInputElement | null = document.querySelector("#isBackgroundImage");
 
-export {
+export default{
     resetBtn,
     myCanvas,
     movesField,

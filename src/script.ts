@@ -1,6 +1,6 @@
 import loopify from "./loopify.js";
 
-import * as ELEMENTS from "./elements/elements.js";
+import ELEMENTS from "./elements/elements.js";
 import { DEFAULT } from "./default.js";
 
 import { GameConfigType } from "./types/GameConfigType.js";

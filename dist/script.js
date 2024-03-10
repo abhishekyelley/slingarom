@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import loopify from "./loopify.js";
-import * as ELEMENTS from "./elements/elements.js";
+import ELEMENTS from "./elements/elements.js";
 import { DEFAULT } from "./default.js";
 const canvasWidth = ELEMENTS.myCanvas.width;
 const canvasHeight = ELEMENTS.myCanvas.height;
