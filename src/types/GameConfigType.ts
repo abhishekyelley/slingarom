@@ -1,0 +1,25 @@
+export type GameConfigType = {
+    _ballRadius: number,
+    _gravity: number,
+    _friction: number,
+    _speedFactor: number,
+    _totalFood: number,
+    _boundRadius: number,
+    _backgroundImage: boolean,
+
+    get ballRadius(): number,
+    get gravity(): number,
+    get friction(): number,
+    get speedFactor(): number,
+    get totalFood(): number,
+    get boundRadius(): number,
+    get backgroundImage(): boolean,
+
+    set ballRadius(value: number | string),
+    set gravity(value: number | string),
+    set friction(value: number | string),
+    set speedFactor(value: number | string),
+    set totalFood(value: number | string),
+    set boundRadius(value: number | string),
+    set backgroundImage(value: boolean),
+};

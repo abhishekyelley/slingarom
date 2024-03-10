@@ -1,75 +1,20 @@
-import * as elements from "./elements/elements";
+import loopify from "./loopify.js";
 
-const canvasWidth = elements.myCanvas!.width;
-const canvasHeight = elements.myCanvas!.height;
+import * as ELEMENTS from "./elements/elements.js";
+import { DEFAULT } from "./default.js";
+
+import { GameConfigType } from "./types/GameConfigType.js";
+import { AudioControlType } from "./types/AudioControlType.js";
+
+const canvasWidth = ELEMENTS.myCanvas!.width;
+const canvasHeight = ELEMENTS.myCanvas!.height;
 
 // Inital co-ords for boundCircle
 let boundX = canvasWidth / 2;
 let boundY = canvasHeight / 2;
 
-// configurables
-const DEFAULT = {
-    _FoodRadius: 15,
-    _FoodSpawnPadding: 50,
-    _BallRadius: 50,
-    _Gravity: 0.5,
-    _Friction: 0.65,
-    _SpeedFactor: 0.5,   // determines launch speed
-    _TotalFood: 4,
-    _BoundRadius: 120,   // determines how far you can pull the sling
-    get FoodRadius(): number{
-        return this._FoodRadius;
-    },
-    get FoodSpawnPadding(): number{
-        return this._FoodSpawnPadding;
-    },
-    get BallRadius(): number{
-        return this._BallRadius;
-    },
-    get Gravity(): number{
-        return this._Gravity;
-    },
-    get Friction(): number{
-        return this._Friction;
-    },
-    get SpeedFactor(): number{
-        return this._SpeedFactor;
-    },
-    get TotalFood(): number{
-        return this._TotalFood;
-    },
-    get BoundRadius(): number{
-        return this._BoundRadius;
-    },
-};
 
-
-type GameConfig = {
-    _ballRadius: number,
-    _gravity: number,
-    _friction: number,
-    _speedFactor: number,
-    _totalFood: number,
-    _boundRadius: number,
-    _backgroundImage: boolean,
-
-    get ballRadius(): number,
-    get gravity(): number,
-    get friction(): number,
-    get speedFactor(): number,
-    get totalFood(): number,
-    get boundRadius(): number,
-    get backgroundImage(): boolean,
-
-    set ballRadius(value: number | string),
-    set gravity(value: number | string),
-    set friction(value: number | string),
-    set speedFactor(value: number | string),
-    set totalFood(value: number | string),
-    set boundRadius(value: number | string),
-    set backgroundImage(value: boolean),
-}
-const gameConfig: GameConfig = {
+const gameConfig: GameConfigType = {
     _ballRadius: DEFAULT.BallRadius,
     _gravity: DEFAULT.Gravity,
     _friction: DEFAULT.Friction,
@@ -174,112 +119,122 @@ const gameConfig: GameConfig = {
 };
 
 function setValuesInputFields() {
-    gameConfig.ballRadius = elements.ballRadiusInput?.value ?? -1;
-    gameConfig.gravity = elements.gravityInput?.value ?? -1;
-    gameConfig.friction = elements.frictionInput?.value ?? -1;
-    gameConfig.speedFactor = elements.speedFactorInput?.value ?? -1;
-    gameConfig.totalFood = elements.totalFoodInput?.value ?? -1;
-    gameConfig.boundRadius = elements.boundRadiusInput?.value ?? -1;
-    gameConfig.backgroundImage = elements.isBackgroundImage?.checked ?? true;
+    gameConfig.ballRadius = ELEMENTS.ballRadiusInput?.value ?? -1;
+    gameConfig.gravity = ELEMENTS.gravityInput?.value ?? -1;
+    gameConfig.friction = ELEMENTS.frictionInput?.value ?? -1;
+    gameConfig.speedFactor = ELEMENTS.speedFactorInput?.value ?? -1;
+    gameConfig.totalFood = ELEMENTS.totalFoodInput?.value ?? -1;
+    gameConfig.boundRadius = ELEMENTS.boundRadiusInput?.value ?? -1;
+    gameConfig.backgroundImage = ELEMENTS.isBackgroundImage?.checked ?? true;
 
-    elements.ballRadiusInput!.value = gameConfig.ballRadius.toString();
-    elements.gravityInput!.value = gameConfig.gravity.toString();
-    elements.frictionInput!.value = gameConfig.friction.toString();
-    elements.speedFactorInput!.value = gameConfig.speedFactor.toString();
-    elements.totalFoodInput!.value = gameConfig.totalFood.toString();
-    elements.boundRadiusInput!.value = gameConfig.boundRadius.toString();
-    elements.isBackgroundImage!.checked = gameConfig.backgroundImage;
+    ELEMENTS.ballRadiusInput!.value = gameConfig.ballRadius.toString();
+    ELEMENTS.gravityInput!.value = gameConfig.gravity.toString();
+    ELEMENTS.frictionInput!.value = gameConfig.friction.toString();
+    ELEMENTS.speedFactorInput!.value = gameConfig.speedFactor.toString();
+    ELEMENTS.totalFoodInput!.value = gameConfig.totalFood.toString();
+    ELEMENTS.boundRadiusInput!.value = gameConfig.boundRadius.toString();
+    ELEMENTS.isBackgroundImage!.checked = gameConfig.backgroundImage;
 }
 
 setValuesInputFields();
 
-var running = false;
-const ctx = elements.myCanvas!.getContext("2d");
+let running = false;
+const ctx = ELEMENTS.myCanvas!.getContext("2d");
 ctx!.imageSmoothingEnabled = false;
 
-var SCORE = 0;
-var MOVES = 0;
+let SCORE = 0;
+let MOVES = 0;
 
 function setScore() {
-    elements.scoreField!.innerHTML = `<strong>SCORE: ${SCORE}</strong>`;
+    ELEMENTS.scoreField!.innerHTML = `<strong>SCORE: ${SCORE}</strong>`;
 }
 
 function setMoves() {
-    elements.movesField!.innerHTML = `<strong>MOVES: ${MOVES}</strong>`;
+    ELEMENTS.movesField!.innerHTML = `<strong>MOVES: ${MOVES}</strong>`;
 }
 
 const hitSound = new Audio("assets/audio/hit.mp3");
 const foodBiteSound = new Audio("assets/audio/eat.mp3");
-loopify("assets/audio/slingarom_theme.mp3", function (err, loop) {
+
+loopify("assets/audio/slingarom_theme.mp3", function (err: Error | null, audioControl?: AudioControlType) {
 
     // If something went wrong, `err` is supplied
     if (err) {
-        return console.err(err);
+        return console.error(err);
     }
 
     // Play it whenever you want
-    // loop.play();
+    // audioControl.play();
 
     // Stop it later if you feel like it
-    elements.muteBtn!.addEventListener("click", () => {
-        if (elements.muteBtn!.innerHTML == `<i class="fa-solid fa-volume-high" aria-hidden="true"></i>`) {
-            elements.muteBtn!.innerHTML = `<i class="fa-solid fa-volume-xmark" aria-hidden="true"></i>`;
-            loop.stop();
+    ELEMENTS.muteBtn!.addEventListener("click", () => {
+        if (ELEMENTS.muteBtn!.innerHTML == `<i class="fa-solid fa-volume-high" aria-hidden="true"></i>`) {
+            ELEMENTS.muteBtn!.innerHTML = `<i class="fa-solid fa-volume-xmark" aria-hidden="true"></i>`;
+            audioControl?.stop();
         }
         else {
-            elements.muteBtn!.innerHTML = `<i class="fa-solid fa-volume-high" aria-hidden="true"></i>`;
-            loop.play();
+            ELEMENTS.muteBtn!.innerHTML = `<i class="fa-solid fa-volume-high" aria-hidden="true"></i>`;
+            audioControl?.play();
         }
     });
 });
 
-elements.menuBtn!.addEventListener("click", handleMenuClick);
+ELEMENTS.menuBtn!.addEventListener("click", handleMenuClick);
 function handleMenuClick() {
-    if (elements.menuItems!.style.opacity == "0") {
-        // elements.menuItems!.style.display = "block";
-        elements.menuItems!.style.left = "0vh";
-        elements.menuItems!.style.opacity = "1";
+    if (ELEMENTS.menuItems!.style.opacity === "0") {
+        // ELEMENTS.menuItems!.style.display = "block";
+        ELEMENTS.menuItems!.style.left = "0vh";
+        ELEMENTS.menuItems!.style.opacity = "1";
     }
     else {
-        // elements.menuItems!.style.display = "none";
-        elements.menuItems!.style.left = "-" + elements.menuItems!.style.width;
-        elements.menuItems!.style.opacity = "0";
+        // ELEMENTS.menuItems!.style.display = "none";
+        ELEMENTS.menuItems!.style.left = "-" + ELEMENTS.menuItems!.style.width;
+        ELEMENTS.menuItems!.style.opacity = "0";
     }
 }
 
-addEventListener("keyup", handleEscUp);
-function handleEscUp() {
-    // elements.menuItems!.style.display = "none";
-    elements.menuItems!.style.left = "-" + elements.menuItems!.style.width;
-    elements.menuItems!.style.opacity = "0";
+addEventListener("keydown", handleKeyDown);
+function handleKeyDown(event: KeyboardEvent) {
+    // ELEMENTS.menuItems!.style.display = "none";
+    if(event.key === "Escape"){
+        ELEMENTS.menuItems!.style.left = "-" + ELEMENTS.menuItems!.style.width;
+        ELEMENTS.menuItems!.style.opacity = "0";
+    }
 }
 
 
-elements.gameConfigForm!.addEventListener("submit", (e) => {
+ELEMENTS.gameConfigForm!.addEventListener("submit", (e) => {
     e.preventDefault();
     setValuesInputFields();
     foodPositions = [];
     initFood(gameConfig.totalFood);
 
-    elements.resetBtn!.click();
+    ELEMENTS.resetBtn!.click();
 });
-elements.restoreBtn!.addEventListener("click", () => {
-    elements.ballRadiusInput!.value = "";
-    elements.gravityInput!.value = "";
-    frictionInput.value = "";
-    speedFactorInput.value = "";
-    totalFoodInput.value = "";
-    boundRadiusInput.value = "";
-    elements.applyBtn!.click();
+ELEMENTS.restoreBtn!.addEventListener("click", () => {
+    ELEMENTS.ballRadiusInput!.value = "";
+    ELEMENTS.gravityInput!.value = "";
+    ELEMENTS.frictionInput!.value = "";
+    ELEMENTS.speedFactorInput!.value = "";
+    ELEMENTS.totalFoodInput!.value = "";
+    ELEMENTS.boundRadiusInput!.value = "";
+    ELEMENTS.applyBtn!.click();
 });
-randomizeBtn.addEventListener("click", () => {
-    elements.ballRadiusInput.value = Math.random() * 100;
-    elements.gravityInput.value = Math.random() * 10;
-    frictionInput.value = Math.random();
-    speedFactorInput.value = Math.random() * 2;
-    totalFoodInput.value = Math.random() * 20;
-    boundRadiusInput.value = Math.random() * 200;
-    elements.applyBtn!.click();
+ELEMENTS.randomizeBtn!.addEventListener("click", () => {
+    ELEMENTS.ballRadiusInput!.value = (Math.random() * 100).toString();
+    ELEMENTS.gravityInput!.value = (Math.random() * 10).toString();
+    ELEMENTS.frictionInput!.value = (Math.random()).toString();
+    ELEMENTS.speedFactorInput!.value = (Math.random() * 2).toString();
+    ELEMENTS.totalFoodInput!.value = (Math.random() * 20).toString();
+    ELEMENTS.boundRadiusInput!.value = (Math.random() * 200).toString();
+    ELEMENTS.applyBtn!.click();
+
+    // gameConfig.ballRadius = Math.random() * 100;
+    // gameConfig.gravity = Math.random() * 10;
+    // gameConfig.friction = Math.random();
+    // gameConfig.speedFactor = Math.random() * 2;
+    // gameConfig.totalFood = Math.random() * 20;
+    // gameConfig.boundRadius = Math.random() * 200;
 })
 function playHitAudio() {
 
@@ -297,32 +252,35 @@ function playFoodAudio() {
     foodBiteSound.play();
 }
 
+type FoodPosition = {
+    x: number,
+    y: number,
+    ate: boolean,
+}
 
+let foodPositions: Array<FoodPosition> = [];
 
-var foodPositions = [];
-
-function initFood(value) {
+function initFood(value: number) {
     for (var i = 0; i < value; i++)
-        foodPositions.push({});
+        foodPositions.push({
+            x: 0,
+            y: 0,
+            ate: false
+        });
 }
 initFood(gameConfig.totalFood);
-
-function roundToNearest(what, number) {
-    return Math.round(number / what) * what;
-}
 
 function createFood() {
     const minDistance = 100;
     const centerThreshold = ball.radius;
     for (var i = 0; i < gameConfig.totalFood; i++) {
-        let x, y;
+        let x: number, y: number;
         // foodPositions[i] = {
         //     x: roundToNearest(100, Math.floor(Math.random() * (canvasWidth - 2 * DEFAULT.FoodSpawnPadding)) + DEFAULT.FoodSpawnPadding),
         //     y: roundToNearest(100, Math.floor(Math.random() * (canvasHeight - 2 * DEFAULT.FoodSpawnPadding)) + DEFAULT.FoodSpawnPadding),
         //     ate: false
         // };
         do {
-            // Generate random coordinates
             x = Math.floor(Math.random() * (canvasWidth - 2 * DEFAULT.FoodSpawnPadding)) + DEFAULT.FoodSpawnPadding;
             y = Math.floor(Math.random() * (canvasHeight - 2 * DEFAULT.FoodSpawnPadding)) + DEFAULT.FoodSpawnPadding;
         } while (
@@ -339,14 +297,14 @@ function createFood() {
     }
 }
 
-function drawStar(cX, cY, R, N) {
+function drawStar(cX: number, cY: number, R: number, N: number) {
     // ctx.beginPath();
     // ctx.arc(starX, starY, 10, 0, 2*Math.PI);
     // ctx.fillStyle = "#FFFFFF";
     // ctx.fill();
     // ctx.closePath();
-    ctx.beginPath();
-    ctx.moveTo(cX + R, cY);
+    ctx?.beginPath();
+    ctx?.moveTo(cX + R, cY);
     for (var i = 1; i <= N * 2; i++) {
         if (i % 2 == 0) {
             var theta = i * (Math.PI * 2) / (N * 2);
@@ -359,11 +317,11 @@ function drawStar(cX, cY, R, N) {
             var y = cY + ((R / 2) * Math.sin(theta));
         }
 
-        ctx.lineTo(x, y);
+        ctx?.lineTo(x, y);
     }
-    ctx.closePath();
-    ctx.fillStyle = "#FFD700";
-    ctx.fill();
+    ctx?.closePath();
+    ctx!.fillStyle = "#FFD700";
+    ctx?.fill();
     // ctx.stroke();
 }
 function drawAllFood() {
@@ -375,52 +333,52 @@ function drawAllFood() {
 
 
 function drawBelts() {
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(boundX - gameConfig.boundRadius, boundY);
-    ctx.lineTo(ball.posX - ball.radius, ball.posY);
-    ctx.stroke();
-    ctx.closePath();
+    ctx!.lineWidth = 3;
+    ctx?.beginPath();
+    ctx?.moveTo(boundX - gameConfig.boundRadius, boundY);
+    ctx?.lineTo(ball.posX - ball.radius, ball.posY);
+    ctx?.stroke();
+    ctx?.closePath();
 
-    ctx.beginPath();
-    ctx.moveTo(boundX + gameConfig.boundRadius, boundY);
-    ctx.lineTo(ball.posX + ball.radius, ball.posY);
-    ctx.stroke();
-    ctx.closePath();
-    ctx.lineWidth = 1;
+    ctx?.beginPath();
+    ctx?.moveTo(boundX + gameConfig.boundRadius, boundY);
+    ctx?.lineTo(ball.posX + ball.radius, ball.posY);
+    ctx?.stroke();
+    ctx?.closePath();
+    ctx!.lineWidth = 1;
 }
 
 
 function drawBoundingCircle() {
-    ctx.beginPath();
-    ctx.arc(boundX, boundY, gameConfig.boundRadius, 0, 2 * Math.PI);
-    ctx.stroke();
-    ctx.closePath();
+    ctx?.beginPath();
+    ctx?.arc(boundX, boundY, gameConfig.boundRadius, 0, 2 * Math.PI);
+    ctx?.stroke();
+    ctx?.closePath();
 }
 // drawBoundingCircle();
 function clearCanvas() {
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    ctx?.clearRect(0, 0, canvasWidth, canvasHeight);
     drawBackgroundImage();
     // drawBoundingCircle();
 }
 class Ball {
-    constructor(posX, posY, radius, xVel, yVel) {
-        this.radius = radius;
-        this.posX = posX;
-        this.posY = posY;
-        this.xVel = xVel;
-        this.yVel = yVel;
-        this.color = "#cefad0"
+    constructor(
+        public posX: number,
+        public posY: number,
+        public radius: number,
+        public xVel: number,
+        public yVel: number,
+        public color: string = "#cefad0") {
     }
     drawBall() {
-        ctx.beginPath();
+        ctx?.beginPath();
 
-        ctx.arc(this.posX, this.posY, this.radius, 0, 2 * Math.PI);
+        ctx?.arc(this.posX, this.posY, this.radius, 0, 2 * Math.PI);
         // ctx.stroke();
 
-        ctx.fillStyle = this.color;
-        ctx.fill();
-        ctx.closePath();
+        ctx!.fillStyle = this.color;
+        ctx?.fill();
+        ctx?.closePath();
 
 
     }
@@ -474,16 +432,16 @@ class Ball {
 
 async function INIT_CANVAS() {
     backgroundImage.src = "assets/image/alexandru-bogdan-ghita-javr3cmXbSE-unsplash.jpg";
-    await new Promise((res, rej) => { backgroundImage.onload = () => res() })
+    await new Promise((resolve, reject) => { backgroundImage.onload = () => resolve(true) })
     createFood();
     drawBackgroundImage();
     drawAllFood();
     ball.drawBall();
 }
 
-var ball = new Ball(canvasWidth / 2, canvasHeight / 2, gameConfig.ballRadius, 0, 0);
+let ball = new Ball(canvasWidth / 2, canvasHeight / 2, gameConfig.ballRadius, 0, 0);
 const backgroundImage = new Image();
-var ballHolderRadius = (ball.radius * Math.sqrt(2)).toFixed(0);
+let ballHolderRadius = (ball.radius * Math.sqrt(2)).toFixed(0);
 INIT_CANVAS();
 
 function generateRandomScale() {
@@ -496,10 +454,10 @@ function generateRandomScale() {
 function drawBackgroundImage() {
     if (!gameConfig.backgroundImage)
         return;
-    ctx.filter = 'blur(8px)';
+    ctx!.filter = 'blur(8px)';
     // scale = generateRandomScale();
-    ctx.drawImage(backgroundImage, -1400, -50, canvasWidth + 2000, canvasHeight + 2000);
-    ctx.filter = 'none';
+    ctx?.drawImage(backgroundImage, -1400, -50, canvasWidth + 2000, canvasHeight + 2000);
+    ctx!.filter = 'none';
 }
 
 function handleMouseDown() {
@@ -525,10 +483,10 @@ function handleMouseDown() {
 }
 
 // Calculates and draws ball position when being dragged
-function handleMoveOnDown(moveEvent) {
+function handleMoveOnDown(moveEvent: MouseEvent) {
     // console.log(moveEvent);
-    let curX = moveEvent.pageX - myCanvas.offsetLeft;
-    let curY = moveEvent.pageY - myCanvas.offsetTop;
+    let curX = moveEvent.pageX - ELEMENTS.myCanvas!.offsetLeft;
+    let curY = moveEvent.pageY - ELEMENTS.myCanvas!.offsetTop;
     // console.log(curX, curY, moveEvent.clientX, moveEvent.clientY);
     // Adjust ball position to bounds
     // checks if mouse is outside bounds
@@ -549,11 +507,11 @@ function handleMoveOnDown(moveEvent) {
         ball.posY = curY;
     }
     clearCanvas();
-    ctx.strokeStyle = "#FFFFFF";
+    ctx!.strokeStyle = "#FFFFFF";
     // ctx.strokeStyle = "#4c3228";
     drawBelts();
     drawAllFood();
-    ctx.strokeStyle = "#FFFFFF";
+    ctx!.strokeStyle = "#FFFFFF";
     drawArrow();
     ball.drawBall();
 
@@ -574,36 +532,33 @@ function drawArrow() {
 
     // arrow base line
     if ((tox >= 0 && tox <= canvasWidth) && (toy >= 0 && toy <= canvasHeight)) {
-        ctx.setLineDash([5, 3]);
-        ctx.beginPath();
-        ctx.moveTo(ball.posX, ball.posY);
-        ctx.lineTo(tox, toy);
-        ctx.stroke();
-        ctx.closePath();
+        ctx?.setLineDash([5, 3]);
+        ctx?.beginPath();
+        ctx?.moveTo(ball.posX, ball.posY);
+        ctx?.lineTo(tox, toy);
+        ctx?.stroke();
+        ctx?.closePath();
     } else {
         tox = Math.min(canvasWidth, Math.max(0, tox));
         toy = Math.min(canvasHeight, Math.max(0, toy));
 
-        ctx.setLineDash([5, 3]);
-        ctx.beginPath();
-        ctx.moveTo(ball.posX, ball.posY);
-        ctx.lineTo(tox, toy);
-        ctx.stroke();
-        ctx.closePath();
+        ctx?.setLineDash([5, 3]);
+        ctx?.beginPath();
+        ctx?.moveTo(ball.posX, ball.posY);
+        ctx?.lineTo(tox, toy);
+        ctx?.stroke();
+        ctx?.closePath();
     }
 
     // arrow head
-    ctx.setLineDash([0, 0]);
-    ctx.beginPath();
-    ctx.moveTo(tox, toy);
-    ctx.lineTo(tox + headlen * Math.cos(angle - Math.PI / 6), toy + headlen * Math.sin(angle - Math.PI / 6));
-    ctx.moveTo(tox, toy);
-    ctx.lineTo(tox + headlen * Math.cos(angle + Math.PI / 6), toy + headlen * Math.sin(angle + Math.PI / 6));
-    ctx.stroke();
-    ctx.closePath();
-
-
-
+    ctx?.setLineDash([0, 0]);
+    ctx?.beginPath();
+    ctx?.moveTo(tox, toy);
+    ctx?.lineTo(tox + headlen * Math.cos(angle - Math.PI / 6), toy + headlen * Math.sin(angle - Math.PI / 6));
+    ctx?.moveTo(tox, toy);
+    ctx?.lineTo(tox + headlen * Math.cos(angle + Math.PI / 6), toy + headlen * Math.sin(angle + Math.PI / 6));
+    ctx?.stroke();
+    ctx?.closePath();
 }
 
 // ------------!!!!! ANIMATE IS CALLED HERE !!!!!------------
@@ -650,39 +605,39 @@ function drawBallHolder() {
         ctx.closePath();
     }
     */
-    ctx.fillStyle = "#4c3228";
-    ctx.beginPath();
-    ctx.roundRect(ball.posX - (ball.radius * 0.8), ball.posY - (ball.radius * 0.4), ball.radius * 1.6, ball.radius * 0.8, [8]);
-    ctx.fill();
-    ctx.closePath();
-    ctx.fillStyle = ball.color;
+    ctx!.fillStyle = "#4c3228";
+    ctx?.beginPath();
+    ctx?.roundRect(ball.posX - (ball.radius * 0.8), ball.posY - (ball.radius * 0.4), ball.radius * 1.6, ball.radius * 0.8, [8]);
+    ctx?.fill();
+    ctx?.closePath();
+    ctx!.fillStyle = ball.color;
 
-    ctx.strokeStyle = "#4c3228";
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(ball.posX - ball.radius, ball.posY);
-    ctx.lineTo(ball.posX + ball.radius, ball.posY);
-    ctx.stroke();
-    ctx.closePath();
+    ctx!.strokeStyle = "#4c3228";
+    ctx!.lineWidth = 4;
+    ctx?.beginPath();
+    ctx?.moveTo(ball.posX - ball.radius, ball.posY);
+    ctx?.lineTo(ball.posX + ball.radius, ball.posY);
+    ctx?.stroke();
+    ctx?.closePath();
 }
 
 
 // Listen for mouse position to find if its on ball
-myCanvas.addEventListener("mousemove", (moveEvent) => {
+ELEMENTS.myCanvas!.addEventListener("mousemove", (moveEvent) => {
     // theres an issue here when the ball is on ground and when mouse hovers and then moves away from the ball in downwards, the cursor is still in grab
     if (Math.pow(moveEvent.offsetX - ball.posX, 2) + Math.pow(moveEvent.offsetY - ball.posY, 2) <= ball.radius * ball.radius) {
         document.body.style.cursor = "grab";
-        myCanvas.addEventListener("mousedown", handleMouseDown);
+        ELEMENTS.myCanvas!.addEventListener("mousedown", handleMouseDown);
     }
     else {
         document.body.style.cursor = "default";
-        myCanvas.removeEventListener("mousedown", handleMouseDown);
+        ELEMENTS.myCanvas!.removeEventListener("mousedown", handleMouseDown);
     }
 });
 
 function resetGame() {
     running = false;
-    mainHeading.textContent = "PULL THE BALL";
+    ELEMENTS.mainHeading!.textContent = "PULL THE BALL";
     boundX = canvasWidth / 2;
     boundY = canvasHeight / 2;
     ball = new Ball(boundX, boundY, gameConfig.ballRadius, 0, 0);
@@ -698,13 +653,13 @@ function resetGame() {
 }
 
 
-elements.resetBtn!.addEventListener("click", () => {
+ELEMENTS.resetBtn!.addEventListener("click", () => {
     resetGame();
 });
 
 function animate() {
     if (MOVES != 0)
-        mainHeading.textContent = "PULL IT AGAIN";
+        ELEMENTS.mainHeading!.textContent = "PULL IT AGAIN";
     if (running) {
         clearCanvas();
         drawAllFood();
@@ -714,3 +669,7 @@ function animate() {
 };
 
 requestAnimationFrame(animate);
+
+// function loopify(arg0: string, arg1: (err: Error | null, audioControl: AudioControl) => void) {
+//     throw new Error("Function not implemented.");
+// }
