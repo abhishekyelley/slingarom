@@ -168,7 +168,7 @@ loopify("assets/audio/slingarom_theme.mp3", function (err: Error | null, audioCo
 
     // Stop it later if you feel like it
     ELEMENTS.muteBtn!.addEventListener("click", () => {
-        if (ELEMENTS.muteBtn!.innerHTML == `<i class="fa-solid fa-volume-high" aria-hidden="true"></i>`) {
+        if (ELEMENTS.muteBtn!.innerHTML === `<i class="fa-solid fa-volume-high" aria-hidden="true"></i>`) {
             ELEMENTS.muteBtn!.innerHTML = `<i class="fa-solid fa-volume-xmark" aria-hidden="true"></i>`;
             audioControl?.stop();
         }
@@ -306,7 +306,7 @@ function drawStar(cX: number, cY: number, R: number, N: number) {
     ctx?.beginPath();
     ctx?.moveTo(cX + R, cY);
     for (var i = 1; i <= N * 2; i++) {
-        if (i % 2 == 0) {
+        if (i % 2 === 0) {
             var theta = i * (Math.PI * 2) / (N * 2);
             var x = cX + (R * Math.cos(theta));
             var y = cY + (R * Math.sin(theta));
@@ -411,7 +411,7 @@ class Ball {
                 foodPositions.forEach((item) => {
                     tempCount += item.ate ? 1 : 0;
                 });
-                if (SCORE != tempCount) {
+                if (SCORE !== tempCount) {
                     SCORE = tempCount;
                     playFoodAudio();
                     setScore();
@@ -420,7 +420,7 @@ class Ball {
         });
 
         this.drawBall();
-        if (lastPosX.toFixed(4) == this.posX.toFixed(4) && lastPosY.toFixed(4) == this.posY.toFixed(4))
+        if (lastPosX.toFixed(4) === this.posX.toFixed(4) && lastPosY.toFixed(4) === this.posY.toFixed(4))
             running = false;
     }
 
@@ -464,7 +464,7 @@ function handleMouseDown() {
     if (running) {
         running = false;
     }
-    if (MOVES != 0) {
+    if (MOVES !== 0) {
         boundX = ball.posX;
         boundY = ball.posY;
     }
@@ -658,7 +658,7 @@ ELEMENTS.resetBtn!.addEventListener("click", () => {
 });
 
 function animate() {
-    if (MOVES != 0)
+    if (MOVES !== 0)
         ELEMENTS.mainHeading!.textContent = "PULL IT AGAIN";
     if (running) {
         clearCanvas();
